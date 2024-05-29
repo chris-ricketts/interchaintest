@@ -42,6 +42,8 @@ type ChainConfig struct {
 	GasPrices string `yaml:"gas-prices"`
 	// Adjustment multiplier for gas fees.
 	GasAdjustment float64 `yaml:"gas-adjustment"`
+	// Unbonding time of the chain.
+	UnbondingTime string `yaml:"unbonding-time"`
 	// Trusting period of the chain.
 	TrustingPeriod string `yaml:"trusting-period"`
 	// Do not use docker host mount.
@@ -172,6 +174,10 @@ func (c ChainConfig) MergeChainSpecConfig(other ChainConfig) ChainConfig {
 
 	if other.GasAdjustment > 0 {
 		c.GasAdjustment = other.GasAdjustment
+	}
+
+	if other.UnbondingTime != "" {
+		c.UnbondingTime = other.UnbondingTime
 	}
 
 	if other.TrustingPeriod != "" {

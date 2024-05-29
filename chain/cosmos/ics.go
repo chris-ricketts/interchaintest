@@ -103,6 +103,7 @@ func (c *CosmosChain) StartProvider(testName string, ctx context.Context, additi
 			NewGenesisKV("app_state.gov.params.voting_period", "10s"),
 			NewGenesisKV("app_state.gov.params.max_deposit_period", "10s"),
 			NewGenesisKV("app_state.gov.params.min_deposit.0.denom", c.cfg.Denom),
+			NewGenesisKV("app_state.staking.params.unbonding_time", c.cfg.UnbondingTime),
 		})(cc, b)
 		if err != nil {
 			return nil, err
@@ -135,6 +136,11 @@ func (c *CosmosChain) StartProvider(testName string, ctx context.Context, additi
 		return err
 	}
 
+	unbondingTime, err := time.ParseDuration(c.cfg.UnbondingTime)
+	if err != nil {
+		return fmt.Errorf("failed to parse unbonding time in 'StartProvider': %w", err)
+	}
+
 	trustingPeriod, err := time.ParseDuration(c.cfg.TrustingPeriod)
 	if err != nil {
 		return fmt.Errorf("failed to parse trusting period in 'StartProvider': %w", err)
@@ -156,7 +162,7 @@ func (c *CosmosChain) StartProvider(testName string, ctx context.Context, additi
 			TransferTimeoutPeriod:             trustingPeriod,
 			ConsumerRedistributionFraction:    "0.75",
 			HistoricalEntries:                 10000,
-			UnbondingPeriod:                   trustingPeriod,
+			UnbondingPeriod:                   unbondingTime,
 			Deposit:                           "100000000" + c.cfg.Denom,
 		}
 
